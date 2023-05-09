@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/index.css') }}">
+  <title>Document</title>
+</head>
+<style>
+  .input-container {
+  position: relative;
+  width: 100%;
+}
+
+
+.copy-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 3px 5px;
+  font-size: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: rgb(231, 231, 231);
+  color: rgb(62, 60, 60);
+  cursor: pointer;
+  margin: 0;
+  margin-top: 8px;
+}
+
+.copy-button:hover {
+  background-color: rgb(198, 198, 198);
+}
+
+</style>
+<body>
+  
+  <!-- <video width="320" height="240" controls>
+    <source src="{{ url_for('static', filename='images/darkmode.mp4') }}" type="video/mp4">
+    Your browser does not support the video tag.
+  </video> -->
+  <div class="container" id="container">
+    <div class="toggle-wrapper">
+      <input type="checkbox" id="dark-mode" class="toggle-input">
+      <label for="dark-mode" class="toggle-label aes">
+        <span class="typeCypher" id="typeCypher">AES</span>
+      </label>
+      <div class="background"></div>
+    </div>
+    <div class="form-container register-container">
+      <form id="decryption-form">
+        <h1>Decryption.</h1>
+        <input type="text" id="data" name="data" placeholder="Cipher text..." required>
+        <input type="text" id="key" name="key" placeholder="Key..." required>
+        <button type="submit">Generate</button>
+        <div class="input-container">
+          <!-- <input type="text" name="result" id="decrypt-result"> -->
+          <textarea name="result" id="decrypt-result"></textarea>
+          <button class="copy-button" id="btn1" onclick="copyTextDe()" type="button">Copy</button>
+        </div>
+      </form>
+    </div>
+    <div class="form-container login-container">
+      <form id="encryption-form">
+        <h1>Encryption.</h1>
+        <input type="text" id="data" name="data" placeholder="Plain text..." required>
+        <input type="text" id="key" name="key" placeholder="Key..." required>
+        <button type="submit">Generate</button>
+        <div class="input-container">
+          <textarea name="result" id="decrypt-result"></textarea>
+          <!-- <input type="text" name="result" id="encrypt-result"> -->
+          <button class="copy-button" id="btn2" onclick="copyTextEn()">Copy</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="overlay-container">
+      <div class="overlay">
+        <video id="myVideo" autoplay muted>
+          <source src="{{ url_for('static', filename='images/light.mp4') }}" type="video/mp4">
+        </video>
+        
+        <div class="overlay-panel overlay-left">
+          <h1 class="title">Encryption.</h1>
+          <button class="ghost" id="login">Generate
+            <i class="lni lni-arrow-left login"></i>
+          </button>
+        </div>
+        <div class="overlay-panel overlay-right">
+          <h1 class="title">Decryption</h1>
+          <button class="ghost" id="register">Generate
+            <i class="lni lni-arrow-right register"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <script src="{{ url_for('static', filename='./js/index.js') }}"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+        $(function() {
+        
+      $('#encryption-form').submit(function(event) {
+        event.preventDefault();
+        if(!$("#dark-mode").prop("checked")){
+            var type = "/aes";
+        }else{
+            var type = "/playfair";
+        }
+        var data = $(this).find('input[name="data"]').val();
+        var key = $(this).find('input[name="key"]').val();
+       var url = type + '/encrypt';
+        $.ajax({
+          url: url,
+          type: 'POST',
+          data: {
+            'data': data,
+            'key': key
+          },
+          success: function(response) {
+            $('#encrypt-result').val(response.result);
+          }
+        });
+      });
+    
+      $('#decryption-form').submit(function(event) {
+        event.preventDefault();
+        if(!$("#dark-mode").prop("checked")){
+            var type = "/aes";
+        }else{
+            var type = "/playfair";
+        }
+        var data = $(this).find('input[name="data"]').val();
+        var key = $(this).find('input[name="key"]').val();
+        var url = type + '/decrypt'
+        $.ajax({
+          url: url,
+          type: 'POST',
+          data: {
+            'data': data,
+            'key': key
+          },
+          success: function(response) {
+            console.log(response)
+            $('#decrypt-result').val(response.result);
+          }
+        });
+      });
+    });
+    </script>
+</body>
+
+</html>
