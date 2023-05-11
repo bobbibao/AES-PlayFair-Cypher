@@ -1,8 +1,8 @@
 from flask import Flask, request, render_template, jsonify
-from Crypto.Cipher import AES
-import base64
+import secrets, hmac, hashlib, base64
 from flask.views import MethodView
-from flask import url_for
+from aes import AES
+from ctr import CTR
 
 app = Flask(__name__)
 
@@ -14,21 +14,55 @@ class AESCipher(MethodView):
     def post(self, operation):
         key = request.form['key']
         data = request.form['data']
-        iv = b'0000000000000000'
-        cipher = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv)
-        
+        block_size = 16
+        def encrypt_decrypt(func, in_stream, block_size, count_start):
+            return b"".join(
+                [
+                    func(in_stream[i : i + block_size], i // block_size + count_start)
+                    for i in range(0, len(in_stream), block_size)
+                ]
+            )
         if operation == "encrypt":
-            padded_data = data + (AES.block_size - len(data) % AES.block_size) * chr(AES.block_size - len(data) % AES.block_size)
-            encrypted_data = cipher.encrypt(padded_data.encode('utf-8'))
-            result = base64.b64encode(encrypted_data).decode('utf-8')
-            
+            plaintext = bytes(data, encoding='utf-8')
+            passwd = key
+            salt = secrets.token_bytes(block_size)
+            nonce = secrets.token_bytes(10)
+            counter = 0
+            IV = nonce + counter.to_bytes(6, "big")
+            cipher = AES(password_str=passwd, salt=salt, key_len=256)
+            mode = CTR(cipher, nonce)
+            result = (
+                salt + IV + encrypt_decrypt(mode.encrypt, plaintext, block_size, counter)
+            )
+            hmac_val = hmac.digest(key=cipher.hmac_key, msg=result, digest=hashlib.sha256)
+            result += hmac_val
+            result = base64.b64encode(result).decode("utf-8")
+
         elif operation == "decrypt":
-            encrypted_data = base64.b64decode(request.form['data'])
-            decrypted_data = cipher.decrypt(encrypted_data).decode('utf-8')
-            padded_length = ord(decrypted_data[-1])
-            decrypted_data = decrypted_data[:-padded_length]
-            result = decrypted_data
-        
+            file_in = base64.b64decode(data)
+            passwd = key
+
+            salt = file_in[0:block_size]
+            nonce = file_in[block_size : block_size + 10]
+
+            counter = file_in[block_size + 10 : block_size + 10 + 6]
+            counter = int.from_bytes(counter, "big")
+
+            hmac_val = file_in[-2 * block_size :]
+            cipher = AES(password_str=passwd, salt=salt, key_len=256)
+
+            assert hmac.compare_digest(
+                hmac_val,
+                hmac.digest(
+                    key=cipher.hmac_key,
+                    msg=file_in[: -2 * block_size],
+                    digest=hashlib.sha256,
+                ),
+            ), "HMAC check failed."
+
+            mode = CTR(cipher, nonce)
+            file_in = file_in[2 * block_size : -2 * block_size]
+            result = encrypt_decrypt(mode.decrypt, file_in, block_size, counter).decode('utf-8')
         return jsonify({
             'result': result
         })
@@ -37,6 +71,7 @@ class PlayfairCipher(MethodView):
     def create_matrix(self, key):
         # Tạo ma trận khóa từ chuỗi key
         key = key.upper()
+        base64.encode
         matrix = [[0 for i in range(5)] for j in range(5)]
         letters_added = []
         row = 0
@@ -85,7 +120,6 @@ class PlayfairCipher(MethodView):
         return message
     
     def indexOf(self, letter,matrix):
-        #Trả về vị trí của một kí tự trong ma trận
         for i in range (5):
             try:
                 index = matrix[i].index(letter)
@@ -94,7 +128,6 @@ class PlayfairCipher(MethodView):
                 continue
     
     def playfair_cipher(self, key, message, encrypt=True):
-        #Thực hiện mã hóa hoặc giải mã thông điệp đầu vào bằng Playfair Cipher theo khóa key được cung cấp.
         inc = 1
         if encrypt==False:
             inc = -1
@@ -116,7 +149,6 @@ class PlayfairCipher(MethodView):
         return cipher_text
     
     def post(self, operation):
-        #Nhận thông tin từ form và trả về kết quả mã hóa hoặc giải mã
         key = request.form['key']
         message = request.form['data']
         
@@ -130,6 +162,7 @@ class PlayfairCipher(MethodView):
         return jsonify({
             'result': result
         })
+    
 # Routes
 app.add_url_rule('/', view_func=IndexView.as_view('index'))
 app.add_url_rule('/aes/<string:operation>', view_func=AESCipher.as_view('AESCipher'))

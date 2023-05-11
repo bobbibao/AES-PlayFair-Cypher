@@ -69,16 +69,20 @@ a:hover {
   justify-content: center;
 }
 
-.content input, textarea {
+.content input,
+textarea {
   accent-color: #333;
   width: 12px;
   height: 12px;
 }
+
 textarea {
-  min-height: 60px;
-  height: 30px;
-  box-sizing: border-box;
+  min-height: 90px;
+  height: auto;
+  overflow: auto;
+  max-height: 100px;
 }
+
 .content label {
   font-size: 14px;
   user-select: none;
@@ -118,32 +122,32 @@ button.ghost {
   color: #fff;
 }
 
-button.ghost i{
+button.ghost i {
   position: absolute;
   opacity: 0;
   transition: 0.3s ease-in-out;
 }
 
-button.ghost i.register{
+button.ghost i.register {
   right: 70px;
 }
 
-button.ghost i.login{
+button.ghost i.login {
   left: 70px;
 }
 
-button.ghost:hover i.register{
+button.ghost:hover i.register {
   right: 40px;
   opacity: 1;
 }
 
-button.ghost:hover i.login{
+button.ghost:hover i.login {
   left: 40px;
   opacity: 1;
 }
 
 form {
-  background-color: #fff;
+  background-color: #d8e4fa;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -209,6 +213,7 @@ textarea {
 }
 
 @keyframes show {
+
   0%,
   49.99% {
     opacity: 0;
@@ -236,6 +241,7 @@ textarea {
 .container.right-panel-active .overlay-container {
   transform: translate(-100%);
 }
+
 .overlay {
   color: #fff;
   position: relative;
@@ -246,8 +252,10 @@ textarea {
   transition: all 0.6s ease-in-out;
 
   /* remove the background-image and add these properties for video */
-  background-color: #000; /* set a fallback background color */
-  overflow: hidden; /* hide any overflowing content within the element */
+  background-color: #000;
+  /* set a fallback background color */
+  overflow: hidden;
+  /* hide any overflowing content within the element */
 }
 
 .overlay video {
@@ -270,11 +278,9 @@ textarea {
   right: 0;
   top: 0;
   bottom: 0;
-  background: linear-gradient(
-    to top,
-    rgba(46, 94, 109, 0.4) 40%,
-    rgba(46, 94, 109, 0)
-  );
+  background: linear-gradient(to top,
+      rgba(46, 94, 109, 0.4) 40%,
+      rgba(46, 94, 109, 0));
 }
 
 .container.right-panel-active .overlay {
@@ -395,10 +401,11 @@ textarea {
 }
 
 
-.toggle-wrapper input:checked + label::before {
+.toggle-wrapper input:checked+label::before {
   background-color: #555;
 }
-.toggle-wrapper body{
+
+.toggle-wrapper body {
   position: absolute;
   width: 100%;
   height: 100vh;
@@ -406,32 +413,39 @@ textarea {
   z-index: -1;
   transition: all 1s ease;
 }
-.toggle-wrapper input:checked ~ label::after {
+
+.toggle-wrapper input:checked~label::after {
   width: 30px;
   height: 30px;
-  left: 125px; /* Adjusted from 430px */
+  left: 125px;
+  /* Adjusted from 430px */
   transform: translateX(-100%);
   background: #777ba5;
 }
-.toggle-wrapper input:checked ~ label::before {
+
+.toggle-wrapper input:checked~label::before {
   content: '';
-  left: 135px; /* Adjusted from 440px */
+  left: 135px;
+  /* Adjusted from 440px */
   border: 5px solid rgba(90, 79, 136, 0.2);
   transform: translateX(-100%);
 }
 
-.toggle-wrapper input:checked ~ label {
+.toggle-wrapper input:checked~label {
   background-size: cover;
   background-position: center;
   border: 10px solid rgba(90, 79, 136, 0.2);
 }
-.toggle-wrapper input:checked ~ html{
+
+.toggle-wrapper input:checked~html {
   background-image: url('images/darkmode_1_2.gif');
 }
-.toggle-wrapper input:checked ~ body {
+
+.toggle-wrapper input:checked~body {
   background-color: #0e377c;
 }
-.toggle-wrapper input[type="checkbox"]{
+
+.toggle-wrapper input[type="checkbox"] {
   display: none;
 }
 
@@ -444,14 +458,23 @@ textarea {
 }
 
 .aes {
-      /* left: 0; */
-    /* transform: translateX(0%); */
-    justify-content: flex-end;
-    /* font-weight: 500; */
-    font-weight: 600;
-    font-size: 20px;
+  /* left: 0; */
+  /* transform: translateX(0%); */
+  justify-content: flex-end;
+  /* font-weight: 500; */
+  font-weight: 600;
+  font-size: 20px;
 }
-
+.aes span{
+  color: #2c2c2c;
+  font-weight: bolder;
+  letter-spacing: 0.2em;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, -1px -1px 0 #000;
+  /* background-image: linear-gradient(to bottom, #4C516C 50%, #9FB2DB 50%); */
+  
+  
+}
 .playfair {
   position: absolute;
   /* top: 0; */
@@ -460,15 +483,52 @@ textarea {
   justify-content: flex-start;
   /* transform: translateX(-50%);*/
 }
-span{
+
+.playfair span{
+  font-weight: lighter;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, -1px -1px 0 #000;
+}
+span {
   margin: 0;
   font-size: inherit;
-  color: #000000; /* Màu chữ */
+  color: #000000;
+  /* Màu chữ */
   font-weight: 800;
-  text-shadow: 1px 1px 2px white; 
+  text-shadow: 1px 1px 2px white;
 }
 
-.toggle-wrapper input:checked ~ .aes{
+.toggle-wrapper input:checked~.aes {
   justify-content: flex-start;
   opacity: 0;
+}
+
+.input-container {
+  position: relative;
+  width: 100%;
+}
+
+
+.copy-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 1px 3px;
+  font-size: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: rgb(231, 231, 231);
+  color: rgb(62, 60, 60);
+  cursor: pointer;
+  margin: 0;
+  margin-top: 8px;
+}
+
+.copy-button:hover {
+  background-color: rgb(198, 198, 198);
+}
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
 }
